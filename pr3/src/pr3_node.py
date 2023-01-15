@@ -15,6 +15,7 @@ from cv_bridge import CvBridge
 class ClienteMoveBase:
     def __init__(self, rate, puntos):
         # Conexion al servidor move_base
+        self.anterior = False
         self.escapando = False
         self.puntos = puntos
         self.rate = rate
@@ -28,7 +29,6 @@ class ClienteMoveBase:
         self.image_subscriber = rospy.Subscriber("/camera/rgb/image_raw", Image, self.callback_image, queue_size=1)
         cv.namedWindow("Image Window", 1)
         self.img = None
-        self.anterior = False
 
     def callback_feedback(self, msg):
         self.position = msg.feedback.base_position.pose.position
@@ -52,16 +52,15 @@ class ClienteMoveBase:
         ### IMPORTANTE COMPROBAR QUE LA CAMARA VEA LOS COLORES CORRECTOS
         try:
             self.img = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            print("Llamada")
         except e:
             rospy.logerr("CvBridge Error: {0}".format(e))
 
         
         # resize
-        width = int(self.img.shape[1] * 0.5)
-        height = int(self.img.shape[0] * 0.5)
-        dim = (width, height)
-        self.img = cv.resize(self.img, dim, interpolation = cv.INTER_AREA)
+        # width = int(self.img.shape[1] * 0.5)
+        # height = int(self.img.shape[0] * 0.5)
+        # dim = (width, height)
+        # self.img = cv.resize(self.img, dim, interpolation = cv.INTER_AREA)
 
         hsv = cv.cvtColor(self.img, cv.COLOR_BGR2HSV)
 
@@ -118,7 +117,7 @@ class ClienteMoveBase:
             print("Escape finalizado")
             self.escapando = False
             
-        self.show_image(self.img)
+        # self.show_image(self.img)
 
 
 
@@ -215,12 +214,6 @@ if __name__ == "__main__":
     rate = rospy.Rate(10)
     cliente = ClienteMoveBase(rate, puntos)
 
-    
-    # while position==None and status==None:
-    #     rate.sleep()
-    #     print("Waiting for feedback")
-
-
     result = True
     while True:
         pos = puntos[random.randint(0, len(puntos)-1)]
@@ -228,6 +221,4 @@ if __name__ == "__main__":
         z = 1.57
         result = cliente.moveTo(pos[0], pos[1], z)
         print("Result main:",result)
-        # if result:
-        #     rospy.loginfo("Goal conseguido!")
         rospy.loginfo("Goal conseguido!")
