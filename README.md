@@ -9,3 +9,6 @@ roslaunch turtlebot3_navigation turtlebot3_navigation.launch
 cd (carpeta donde esté el paquete pr3)
 rosrun pr3 pr3_node.py
 ```
+
+Vídeo de demostración:
+[YouTube](https://youtu.be/OstdBWEXG3w)
